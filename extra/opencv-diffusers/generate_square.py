@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+import tkparam
+import time
 
 # Define the size of the window and the square
 window_size = 500
@@ -12,7 +14,12 @@ image = np.zeros((window_size, window_size, 3), dtype=np.uint8)
 center = (window_size // 2, window_size // 2)
 angle = 0
 
-while True:
+# Create tkparam window for parameter adjusting
+tk_window = tkparam.TKParamWindow()
+fps = tk_window.get_scalar('FPS', 60, 10, 120, True)
+looping = True
+
+while looping:
     # Create a copy of the black image
     img_copy = image.copy()
 
@@ -40,8 +47,12 @@ while True:
     angle += 1
 
     # Break the loop if 'q' is pressed
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    next_frame_time = time.time() + 1.0 / fps.get()
+    while time.time() < next_frame_time:
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            looping = False
+            break
 
 # Release the window
 cv2.destroyAllWindows()
+tk_window.quit()
