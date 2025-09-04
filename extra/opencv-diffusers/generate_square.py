@@ -16,8 +16,10 @@ angle = 0
 
 # Create tkparam window for parameter adjusting
 tk_window = tkparam.TKParamWindow()
+rot_vel = tk_window.get_scalar('Rotation velocity', 500, 0, 99999, False)
 fps = tk_window.get_scalar('FPS', 60, 10, 120, True)
 looping = True
+last_time = time.time()
 
 while looping:
     # Create a copy of the black image
@@ -44,7 +46,9 @@ while looping:
     cv2.imshow('Rotating Square', img_copy)
 
     # Increment the angle
-    angle += 1
+    delta_time = time.time() - last_time
+    angle += delta_time * rot_vel.get()
+    # angle += 2
 
     # Break the loop if 'q' is pressed
     next_frame_time = time.time() + 1.0 / fps.get()
@@ -52,6 +56,8 @@ while looping:
         if cv2.waitKey(1) & 0xFF == ord('q'):
             looping = False
             break
+
+    last_time = time.time()
 
 # Release the window
 cv2.destroyAllWindows()
